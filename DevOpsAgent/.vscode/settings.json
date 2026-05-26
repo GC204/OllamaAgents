@@ -1,0 +1,16 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^cd backend ; python -m uvicorn app:app --reload --port 8000 --log-level debug 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python -c \"\nimport requests\nimport json\n\nresponse = requests\\.post\\(\n    'http://localhost:8000/api/sessions',\n    json=\\{'repo_name': 'python/cpython', 'release_branch': 'main'\\},\n    timeout=10\n\\)\nprint\\('Status:', response\\.status_code\\)\nif response\\.status_code == 201:\n    data = response\\.json\\(\\)\n    print\\('SUCCESS!'\\)\n    print\\('Session ID:', data\\['id'\\]\\)\n    print\\('Repo:', data\\['repo_name'\\]\\)\n    print\\('Branch:', data\\['release_branch'\\]\\)\n    print\\('Status:', data\\['status'\\]\\)\nelse:\n    print\\('Error:', response\\.text\\)\n\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd backend ; python -m uvicorn app:app --reload --port 8000$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

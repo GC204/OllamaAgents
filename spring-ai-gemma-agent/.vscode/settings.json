@@ -1,0 +1,35 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^docker-compose ps$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^docker-compose up -d$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "docker exec": true,
+        "/^mvn install$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "docker volume": true,
+        "/^docker stop jira_app pgvector_db$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^docker rm jira_app pgvector_db$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "docker compose": true,
+        "/^docker exec pgvector_db psql -U jirauser -d jiradb << 'EOF'\nCREATE TABLE IF NOT EXISTS documents \\(\n    id SERIAL PRIMARY KEY,\n    name VARCHAR\\(255\\),\n    embedding vector\\(3\\)\n\\);\n\nINSERT INTO documents \\(name, embedding\\) VALUES\n    \\('Document A', '\\[0\\.1, 0\\.2, 0\\.3\\]'\\),\n    \\('Document B', '\\[0\\.4, 0\\.5, 0\\.6\\]'\\),\n    \\('Document C', '\\[0\\.7, 0\\.8, 0\\.9\\]'\\);\n\nSELECT \\* FROM documents;\nEOF$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^docker cp \"e:\\\\Ollama\\\\Agents\\\\spring-ai-gemma-agent\\\\test_pgvector\\.sql\" pgvector_db:/tmp/test_pgvector\\.sql$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

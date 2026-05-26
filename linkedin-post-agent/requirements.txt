@@ -1,0 +1,23 @@
+# LinkedIn Post Generator Agent
+playwright>=1.40.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml[html-clean]>=5.1.0
+pydantic>=2.5.0
+rich>=13.7.0
+prompt-toolkit>=3.0.43
+
+# Web UI dependencies
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.6
+aiofiles>=23.2.0
+websockets>=12.0
+
+# RAG dependencies
+duckduckgo-search>=5.0.0
+newspaper3k>=0.2.8
+nltk>=3.8.0
+sentence-transformers>=2.3.0
+faiss-cpu>=1.7.4

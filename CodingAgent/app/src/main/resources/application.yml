@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: ollama-chat-app
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: llama3.2
+    # Optional: use a different model (e.g. mistral, qwen2.5)
+    # ollama.chat.options.model: mistral
+
+app:
+  ai:
+    primary-model: gemma4:31b-cloud
+    fallback-model: llama3.2

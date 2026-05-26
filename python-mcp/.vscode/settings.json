@@ -1,0 +1,12 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^python server\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^e:\\\\Ollama\\\\Agents\\\\python-mcp\\\\venv\\\\Scripts\\\\python\\.exe test_client\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

@@ -1,0 +1,86 @@
+package com.example.aiagent;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+@Service
+public class AgentService {
+    private static final Logger logger = LoggerFactory.getLogger(AgentService.class);
+    private static final Pattern SEARCH_PATTERN = Pattern.compile("(?:\\*\\*)?SEARCH:\\s*(.+?)(?:\\*\\*)?(?:\\n|$)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern THINK_PATTERN = Pattern.compile("(?:\\*\\*)?THINK:\\s*(.+?)(?:\\n|$)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final Pattern FINAL_PATTERN = Pattern.compile("(?:\\*\\*)?FINAL ANSWER:\\s*(.+?)$", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    private static final int MAX_ITERATIONS = 3;
+
+    private final ChatClient chatClient;
+    private final WebSearchService webSearchService;
+
+    public AgentService(ChatClient.Builder builder, WebSearchService webSearchService) {
+        this.webSearchService = webSearchService;
+        this.chatClient = builder
+                .defaultSystem("You are a ReAct agent (Reasoning + Acting). CRITICAL RULES:\n" +
+                               "1. You MUST search for information on the web first\n" +
+                               "2. Only provide FINAL ANSWER after you have received search results\n" +
+                               "3. Never provide a FINAL ANSWER without first doing a SEARCH\n\n" +
+                               "Process:\n" +
+                               "**THINK:** Reason about what you need to find\n" +
+                               "**SEARCH: your query here** (You MUST include this)\n" +
+                               "**FINAL ANSWER:** Only after receiving search results\n\n" +
+                               "You will receive search results after you provide a SEARCH query. Use those results for your FINAL ANSWER.")
+                .build();
+    }
+
+    public String chat(String userMessage) {
+        logger.info("🎯 User question: {}", userMessage);
+        
+        StringBuilder conversationHistory = new StringBuilder();
+        conversationHistory.append("Question: ").append(userMessage).append("\n\n");
+        
+        for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
+            logger.info("=== ReAct Iteration {} ===", iteration + 1);
+            
+            // Get agent thinking and actions
+            String agentResponse = chatClient.prompt()
+                    .user(conversationHistory.toString())
+                    .call()
+                    .content();
+            
+            logger.info("Agent response:\n{}", agentResponse);
+            conversationHistory.append("Agent: ").append(agentResponse).append("\n\n");
+            
+            // Extract and execute SEARCH FIRST (before checking for final answer)
+            Matcher searchMatcher = SEARCH_PATTERN.matcher(agentResponse);
+            if (searchMatcher.find()) {
+                String query = searchMatcher.group(1).trim().replaceAll("\\*\\*", "").trim();
+                logger.info("🔍 Searching for: {}", query);
+                
+                String searchResults = webSearchService.search(query);
+                logger.info("📊 Got {} bytes of results", searchResults.length());
+                
+                conversationHistory.append("Search Results for '").append(query).append("':\n")
+                        .append(searchResults).append("\n\n");
+                
+                // Continue to next iteration to get refined answer with search results
+                continue;
+            }
+            
+            // Only check for FINAL ANSWER if there was NO SEARCH in this response
+            Matcher finalMatcher = FINAL_PATTERN.matcher(agentResponse);
+            if (finalMatcher.find()) {
+                String finalAnswer = finalMatcher.group(1).trim();
+                logger.info("✅ Final answer found!");
+                return finalAnswer;
+            }
+            
+            logger.warn("⚠️ No search or final answer found, exiting loop");
+            break;
+        }
+        
+        logger.warn("❌ Max iterations reached without a final answer");
+        return "Unable to find a definitive answer. Please try a more specific question.";
+    }
+}

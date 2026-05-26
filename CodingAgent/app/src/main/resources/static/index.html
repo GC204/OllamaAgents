@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ollama Chat</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f172a;
+      --panel: #111827;
+      --muted: #94a3b8;
+      --text: #e2e8f0;
+      --accent: #22c55e;
+      --user: #1d4ed8;
+      --bot: #374151;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #0b1220, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+    .app {
+      width: min(860px, 100%);
+      background: var(--panel);
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: min(85vh, 760px);
+    }
+    .header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #1f2937;
+      font-weight: 700;
+    }
+    .messages {
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .msg-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: 88%;
+    }
+    .msg {
+      padding: 12px 14px;
+      border-radius: 12px;
+      line-height: 1.55;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      word-spacing: normal;
+      letter-spacing: normal;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .msg-wrap.user { align-self: flex-end; }
+    .msg-wrap.bot { align-self: flex-start; }
+    .msg.user { background: linear-gradient(160deg, #1d4ed8, #1e40af); }
+    .msg.bot { background: linear-gradient(160deg, #334155, #1f2937); }
+    .meta {
+      color: var(--muted);
+      font-size: 11px;
+      padding: 0 4px;
+      letter-spacing: 0.2px;
+    }
+    .content p {
+      margin: 0 0 10px;
+      white-space: normal;
+    }
+    .content p:last-child {
+      margin-bottom: 0;
+    }
+    .content h1, .content h2, .content h3 {
+      margin: 0 0 10px;
+      line-height: 1.25;
+    }
+    .content h1 { font-size: 20px; }
+    .content h2 { font-size: 18px; }
+    .content h3 { font-size: 16px; }
+    .content ul, .content ol {
+      margin: 0 0 10px 20px;
+      padding: 0;
+    }
+    .content li {
+      margin-bottom: 4px;
+    }
+    .content hr {
+      border: none;
+      border-top: 1px solid rgba(148, 163, 184, 0.35);
+      margin: 12px 0;
+    }
+    .content blockquote {
+      margin: 8px 0 10px;
+      padding: 8px 12px;
+      border-left: 3px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.45);
+      border-radius: 6px;
+      color: #d1d5db;
+    }
+    .content code {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+    }
+    .content pre {
+      margin: 10px 0;
+      background: rgba(2, 6, 23, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      overflow-x: auto;
+    }
+    .content pre code {
+      border: none;
+      background: transparent;
+      padding: 0;
+      font-size: 12px;
+      white-space: pre;
+    }
+    .typing {
+      display: inline-block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-left: 6px;
+      animation: pulse 1.2s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.35; }
+      50% { opacity: 1; }
+      100% { opacity: 0.35; }
+    }
+    .composer {
+      border-top: 1px solid #1f2937;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 12px;
+    }
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid #334155;
+      background: #0b1220;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    button {
+      border: none;
+      background: var(--accent);
+      color: #052e16;
+      font-weight: 700;
+      border-radius: 8px;
+      padding: 0 16px;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.6; cursor: wait; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="header">Spring AI + Ollama Chat</div>
+    <section id="messages" class="messages">
+      <div class="msg bot">Hi! Ask me anything.</div>
+    </section>
+    <form id="chatForm" class="composer">
+      <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off" required>
+      <button id="sendBtn" type="submit">Send</button>
+    </form>
+  </main>
+
+  <script>
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('messageInput');
+    const messages = document.getElementById('messages');
+    const sendBtn = document.getElementById('sendBtn');
+
+    let activeStream = null;
+
+    function nowTime() {
+      return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    /**
+     * Models sometimes omit spaces (especially when streaming). Insert a space between
+     * chunks when both sides look like separate tokens (letters/digits meeting).
+     */
+    function appendStreamingChunk(buffer, chunk) {
+      if (!chunk) return buffer;
+      if (!buffer) return chunk;
+      const last = buffer[buffer.length - 1];
+      const first = chunk[0];
+      const lastAlnum = /[A-Za-z0-9)]/.test(last);
+      const firstAlnum = /[A-Za-z0-9(]/.test(first);
+      const lastSpace = /\s/.test(last);
+      const firstSpace = /\s/.test(first);
+      if (firstSpace || lastSpace) return buffer + chunk;
+      if (lastAlnum && firstAlnum) return `${buffer} ${chunk}`;
+      return buffer + chunk;
+    }
+
+    /**
+     * Fix common markdown-ish gluing from models: ###1.Title, **word**Next, sentence runs.
+     */
+    function normalizeAssistantText(raw) {
+      if (!raw) return raw;
+      let s = raw;
+      s = s.replace(/\r\n/g, '\n');
+      s = s.split('\n').map((line) => {
+        const hm = line.match(/^(#{1,6})(\S.*)$/);
+        if (hm && !/^#{1,6}\s/.test(line)) {
+          return `${hm[1]} ${hm[2]}`;
+        }
+        return line;
+      }).join('\n');
+      s = s.replace(/\*\*([^*]+)\*\*([A-Za-z*])/g, '**$1** $2');
+      s = s.replace(/([.!?])([A-Z][a-z])/g, '$1 $2');
+      s = s.replace(/([a-z])([A-Z][a-z]{2,})/g, '$1 $2');
+      return s;
+    }
+
+    function applyBoldAndInlineCode(escapedProse) {
+      let t = escapedProse.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      t = t.replace(/`([^`]+)`/g, '<code>$1</code>');
+      return t;
+    }
+
+    function renderResponse(raw) {
+      function formatTextBlock(text) {
+        const lines = text.split('\n');
+        const htmlParts = [];
+        let paragraphBuffer = [];
+        let listType = null;
+        let listItems = [];
+
+        function flushParagraph() {
+          if (paragraphBuffer.length === 0) return;
+          htmlParts.push(`<p>${paragraphBuffer.join('<br>')}</p>`);
+          paragraphBuffer = [];
+        }
+
+        function flushList() {
+          if (!listType || listItems.length === 0) return;
+          htmlParts.push(`<${listType}>${listItems.map((item) => `<li>${item}</li>`).join('')}</${listType}>`);
+          listType = null;
+          listItems = [];
+        }
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) {
+            flushParagraph();
+            flushList();
+            continue;
+          }
+
+          const heading = trimmed.match(/^(#{1,6})\s+(.+)$/);
+          if (heading) {
+            flushParagraph();
+            flushList();
+            const level = Math.min(heading[1].length, 6);
+            htmlParts.push(`<h${level}>${heading[2]}</h${level}>`);
+            continue;
+          }
+
+          if (/^---+$/.test(trimmed) || /^\*\*\*+$/.test(trimmed)) {
+            flushParagraph();
+            flushList();
+            htmlParts.push('<hr>');
+            continue;
+          }
+
+          const quote = trimmed.match(/^&gt;\s?(.*)$/);
+          if (quote) {
+            flushParagraph();
+            flushList();
+            htmlParts.push(`<blockquote>${quote[1]}</blockquote>`);
+            continue;
+          }
+
+          const unordered = trimmed.match(/^[-*]\s+(.+)$/);
+          if (unordered) {
+            flushParagraph();
+            if (listType !== 'ul') {
+              flushList();
+              listType = 'ul';
+            }
+            listItems.push(unordered[1]);
+            continue;
+          }
+
+          const ordered = trimmed.match(/^\d+\.\s+(.+)$/);
+          if (ordered) {
+            flushParagraph();
+            if (listType !== 'ol') {
+              flushList();
+              listType = 'ol';
+            }
+            listItems.push(ordered[1]);
+            continue;
+          }
+
+          flushList();
+          paragraphBuffer.push(trimmed);
+        }
+
+        flushParagraph();
+        flushList();
+        return htmlParts.join('');
+      }
+
+      const blocks = raw.split('```');
+      let html = '';
+
+      for (let i = 0; i < blocks.length; i += 1) {
+        const part = blocks[i];
+        if (i % 2 === 1) {
+          const trimmed = part.trimStart();
+          const firstBreak = trimmed.indexOf('\n');
+          const maybeLang = firstBreak === -1 ? trimmed : trimmed.slice(0, firstBreak);
+          const hasLang = /^[a-zA-Z0-9_+-]+$/.test(maybeLang);
+          const codeBody = hasLang && firstBreak !== -1 ? trimmed.slice(firstBreak + 1) : trimmed;
+          html += `<pre><code>${escapeHtml(codeBody)}</code></pre>`;
+        } else {
+          const escaped = escapeHtml(part);
+          html += formatTextBlock(applyBoldAndInlineCode(escaped));
+        }
+      }
+
+      return html || '<p></p>';
+    }
+
+    function appendMessage(text, role) {
+      const wrap = document.createElement('div');
+      wrap.className = `msg-wrap ${role}`;
+
+      const bubble = document.createElement('div');
+      bubble.className = `msg ${role} content`;
+      bubble.dataset.raw = text;
+      bubble.innerHTML = role === 'bot'
+        ? renderResponse(normalizeAssistantText(text))
+        : escapeHtml(text);
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = `${role === 'bot' ? 'Assistant' : 'You'} - ${nowTime()}`;
+
+      wrap.appendChild(bubble);
+      wrap.appendChild(meta);
+      messages.appendChild(wrap);
+      messages.scrollTop = messages.scrollHeight;
+      return bubble;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const message = input.value.trim();
+      if (!message) return;
+
+      appendMessage(message, 'user');
+      input.value = '';
+      sendBtn.disabled = true;
+      const botMessage = appendMessage('', 'bot');
+      const typing = document.createElement('span');
+      typing.className = 'typing';
+      typing.textContent = 'streaming...';
+      botMessage.parentElement.querySelector('.meta').appendChild(typing);
+
+      if (activeStream) {
+        activeStream.close();
+      }
+
+      try {
+        activeStream = new EventSource(`/chat/stream?message=${encodeURIComponent(message)}`);
+
+        activeStream.addEventListener('token', (e) => {
+          const prev = botMessage.dataset.raw || '';
+          botMessage.dataset.raw = appendStreamingChunk(prev, e.data);
+          botMessage.innerHTML = renderResponse(normalizeAssistantText(botMessage.dataset.raw));
+          messages.scrollTop = messages.scrollHeight;
+        });
+
+        activeStream.addEventListener('done', () => {
+          typing.remove();
+          activeStream.close();
+          activeStream = null;
+          sendBtn.disabled = false;
+          input.focus();
+        });
+
+        activeStream.addEventListener('error', (e) => {
+          const detail = e?.data ? `: ${e.data}` : '';
+          if (!(botMessage.dataset.raw || '')) {
+            botMessage.dataset.raw = `Error${detail}`;
+            botMessage.innerHTML = renderResponse(botMessage.dataset.raw);
+          }
+        });
+
+        activeStream.onerror = () => {
+          if (activeStream) {
+            activeStream.close();
+            activeStream = null;
+          }
+          typing.remove();
+          if (!(botMessage.dataset.raw || '')) {
+            botMessage.dataset.raw = 'Error: stream disconnected.';
+            botMessage.innerHTML = renderResponse(botMessage.dataset.raw);
+          }
+          sendBtn.disabled = false;
+          input.focus();
+        };
+      } catch (error) {
+        typing.remove();
+        botMessage.dataset.raw = `Error: ${error.message}`;
+        botMessage.innerHTML = renderResponse(botMessage.dataset.raw);
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    });
+  </script>
+</body>
+</html>

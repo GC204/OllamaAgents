@@ -1,0 +1,45 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: spring-ai-gemma-agent
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ai_agent_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 20000
+      idle-timeout: 300000
+  jpa:
+    hibernate:
+      ddl-auto: none
+    defer-datasource-initialization: true
+    generate-ddl: false
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 20
+        format_sql: false
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: gemma4:e2b
+          temperature: 0.7
+
+# MCP Configuration - Flask API Endpoints
+mcp:
+  url: http://127.0.0.1:5000
+  auth-token: 33afbd33fae662d71b5024cc19348c56cfa3b6dae5a16c389b3015aaabbb6f10
+  tool-name: search_wiki
+
+logging:
+  level:
+    org.springframework.ai: DEBUG
+    com.example.aiagent: DEBUG

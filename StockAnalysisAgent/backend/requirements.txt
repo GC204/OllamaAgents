@@ -1,0 +1,26 @@
+# LLM & Agent
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-ollama>=0.2.0
+
+# RAG
+sentence-transformers>=3.0.0
+chromadb>=0.4.0
+
+# Document loaders
+pypdf>=4.0.0
+python-docx>=1.0.0
+openpyxl>=3.1.0
+pandas>=2.0.0
+# API
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-multipart>=0.0.9
+
+# Live stock data (no API key)
+yfinance>=0.2.0
+
+# Utils
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
