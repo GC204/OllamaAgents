@@ -1,0 +1,114 @@
+[
+  {
+    "source": "industry_keyword",
+    "topic": "artificial intelligence",
+    "description": "Trending topic in artificial intelligence",
+    "fetched_at": "2026-04-26T16:55:14.432777",
+    "suggested_angles": [
+      "Share a recent learning or insight about artificial intelligence",
+      "Discuss a common misconception about artificial intelligence",
+      "Predict the future of artificial intelligence",
+      "Share a personal experience related to artificial intelligence",
+      "Explain artificial intelligence to someone new to the field",
+      "Compare old vs new approaches in artificial intelligence"
+    ]
+  },
+  {
+    "source": "industry_keyword",
+    "topic": "machine learning",
+    "description": "Trending topic in machine learning",
+    "fetched_at": "2026-04-26T16:55:14.432777",
+    "suggested_angles": [
+      "Share a recent learning or insight about machine learning",
+      "Discuss a common misconception about machine learning",
+      "Predict the future of machine learning",
+      "Share a personal experience related to machine learning",
+      "Explain machine learning to someone new to the field",
+      "Compare old vs new approaches in machine learning"
+    ]
+  },
+  {
+    "source": "industry_keyword",
+    "topic": "career development",
+    "description": "Trending topic in career development",
+    "fetched_at": "2026-04-26T16:55:14.432777",
+    "suggested_angles": [
+      "Share a recent learning or insight about career development",
+      "Discuss a common misconception about career development",
+      "Predict the future of career development",
+      "Share a personal experience related to career development",
+      "Explain career development to someone new to the field",
+      "Compare old vs new approaches in career development"
+    ]
+  },
+  {
+    "source": "industry_keyword",
+    "topic": "leadership",
+    "description": "Trending topic in leadership",
+    "fetched_at": "2026-04-26T16:55:14.432777",
+    "suggested_angles": [
+      "Share a recent learning or insight about leadership",
+      "Discuss a common misconception about leadership",
+      "Predict the future of leadership",
+      "Share a personal experience related to leadership",
+      "Explain leadership to someone new to the field",
+      "Compare old vs new approaches in leadership"
+    ]
+  },
+  {
+    "source": "industry_keyword",
+    "topic": "innovation",
+    "description": "Trending topic in innovation",
+    "fetched_at": "2026-04-26T16:55:14.432777",
+    "suggested_angles": [
+      "Share a recent learning or insight about innovation",
+      "Discuss a common misconception about innovation",
+      "Predict the future of innovation",
+      "Share a personal experience related to innovation",
+      "Explain innovation to someone new to the field",
+      "Compare old vs new approaches in innovation"
+    ]
+  },
+  {
+    "source": "industry_keyword",
+    "topic": "technology trends",
+    "description": "Trending topic in technology trends",
+    "fetched_at": "2026-04-26T16:55:14.432777",
+    "suggested_angles": [
+      "Share a recent learning or insight about technology trends",
+      "Discuss a common misconception about technology trends",
+      "Predict the future of technology trends",
+      "Share a personal experience related to technology trends",
+      "Explain technology trends to someone new to the field",
+      "Compare old vs new approaches in technology trends"
+    ]
+  },
+  {
+    "source": "industry_keyword",
+    "topic": "workplace culture",
+    "description": "Trending topic in workplace culture",
+    "fetched_at": "2026-04-26T16:55:14.432777",
+    "suggested_angles": [
+      "Share a recent learning or insight about workplace culture",
+      "Discuss a common misconception about workplace culture",
+      "Predict the future of workplace culture",
+      "Share a personal experience related to workplace culture",
+      "Explain workplace culture to someone new to the field",
+      "Compare old vs new approaches in workplace culture"
+    ]
+  },
+  {
+    "source": "industry_keyword",
+    "topic": "digital transformation",
+    "description": "Trending topic in digital transformation",
+    "fetched_at": "2026-04-26T16:55:14.432777",
+    "suggested_angles": [
+      "Share a recent learning or insight about digital transformation",
+      "Discuss a common misconception about digital transformation",
+      "Predict the future of digital transformation",
+      "Share a personal experience related to digital transformation",
+      "Explain digital transformation to someone new to the field",
+      "Compare old vs new approaches in digital transformation"
+    ]
+  }
+]
