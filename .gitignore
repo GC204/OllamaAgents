@@ -1,56 +1,29 @@
-# Build artifacts - Java/Maven
+# Build artifacts and cache
 **/target/
-**/*.jar
-**/*.class
-
-# Maven
-.m2/
+**/node_modules/
+**/dist/
+**/__pycache__/
+**/.pytest_cache/
 
 # Python
-__pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-**/.Python
-**/build/
-**/develop-eggs/
-**/dist/
-**/downloads/
-**/eggs/
-**/.eggs/
-**/parts/
-**/sdist/
-**/var/
-**/wheels/
 **/*.egg-info/
-.installed.cfg
 **/*.egg
-
-# Python Virtual Environments
 **/venv/
 **/env/
-**/ENV/
-**/env.bak/
-**/venv.bak/
 
-# Node
-**/node_modules/
-**/dist/
-
-# IDE
+# IDE and OS
 .vscode/
 .idea/
-.DS_Store/
+.DS_Store
+Thumbs.db
 *.swp
 *.swo
 *~
 
-# OS
-.DS_Store
-Thumbs.db
-
 # Environment
 .env
 .env.local
-.env*.local
